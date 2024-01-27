@@ -1,0 +1,110 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/05/CPU.hdl
+/**
+ * The Hack Central Processing unit (CPU).
+ * Parses the binary code in the instruction input and executes it according to the
+ * Hack machine language specification. In the case of a C-instruction, computes the
+ * function specified by the instruction. If the instruction specifies to read a memory
+ * value, the inM input is expected to contain this value. If the instruction specifies
+ * to write a value to the memory, sets the outM output to this value, sets the addressM
+ * output to the target address, and asserts the writeM output (when writeM == 0, any
+ * value may appear in outM).
+ * If the reset input is 0, computes the address of the next instruction and sets the
+ * pc output to that value. If the reset input is 1, sets pc to 0.
+ * Note: The outM and writeM outputs are combinational: they are affected by the
+ * instruction's execution during the current cycle. The addressM and pc outputs are
+ * clocked: although they are affected by the instruction's execution, they commit to
+ * their new values only in the next cycle.
+ */
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to restart the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // Address of next instruction
+
+    PARTS:
+    // instruction[15] : 0 -> A instruction, 1 -> C instruction
+    // instruction[13..14]: not used
+    // instruction[12]: A
+    // instruction[6..11]: rest of c part
+    //     instruction[11]: c1
+    //     instruction[10]: c2
+    //     instruction[9]: c3
+    //     instruction[8]: c4
+    //     instruction[7]: c5 
+    //     instruction[6]: c6
+    // instruction[3..5]: destination
+    //     instruction[5]: d1
+    //     instruction[4]: d2
+    //     instruction[3]: d3
+    // instruction[0..2]: jump
+    //     instruction[2]: j1
+    //     instruction[1]: j2
+    //     instruction[0]: j3
+
+    Mux16(a=outALU, b=instruction, sel=instA, out=inA);
+    ARegister(in=inA, load=loadA, out=outA, out[0..14]=addressM);
+    DRegister(in=outALU, load=loadD, out=outD);
+    Mux16(a=outA, b=inM, sel=AMtoALU, out=outAM);
+    PC(in=outA, load=loadPC, inc=inc, reset=reset, out[0..14]=pc);
+    ALU(x=outD, y=outAM, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], zr=zr, ng=ng, out=outALU, out=outM);
+
+    // instA
+    Not(in=instruction[15], out=instA);
+    // loadA is true when instruction is A or when instruction C has a destination d1 true
+    And(a=instruction[15], b=instruction[5], out=candd1);
+    Or(a=instA, b=candd1, out=loadA);
+    // loadD is true when instruction is C and d2 is true
+    And(a=instruction[15], b=instruction[4], out=loadD);
+    // AMtoALU. outAM is A when instruction is C and a=0.
+    And(a=instruction[15], b=instruction[12], out=AMtoALU);
+    // Program Counter increments if reset=0 and loadPC=0.
+       Nand(a=reset, b=loadPC, out=inc);
+    
+    Not(in=ng, out=notng);
+    Not(in=zr, out=notzr);
+    
+    // loadPC is true when instruction=C
+    // JGT: j3 and Not(ng) and Not(zr)
+       And(a=instruction[15], b=instruction[0], out=tempJGT1);
+       And(a=tempJGT1, b=notng, out=tempJGT2);
+       And(a=tempJGT2, b=notzr, out=JGT);
+    // JEQ: j2 and zr
+       And(a=instruction[15], b=instruction[1], out=tempJEQ);
+       And(a=tempJEQ, b=zr, out=JEQ);
+    // JGE: j2 and j3, and zr, and Not(ng)
+       And(a=instruction[15], b=instruction[1], out=tempJGE1);
+       And(a=tempJGE1, b=instruction[0], out=tempJGE2);
+       And(a=tempJGE2, b=zr, out=tempJGE3);
+       And(a=tempJGE3, b=notng, out=JGE);
+    // JTL: j1 and ng 
+       And(a=instruction[15], b=instruction[2], out=tempJTL);
+       And(a=tempJTL, b=ng, out=JTL);
+    // JNE: j1 and j3 and Not(zr)
+       And(a=instruction[15], b=instruction[2], out=tempJNE1);
+       And(a=tempJNE1, b=instruction[0], out=tempJNE2);
+       And(a=tempJNE2, b=notzr, out=JNE);
+    // JLE: j1 and j2 and zr and ng
+       And(a=instruction[15], b=instruction[2], out=tempJLE1);
+       And(a=tempJLE1, b=instruction[1], out=tempJLE2);
+       And(a=tempJLE2, b=zr, out=tempJLE3);
+       And(a=tempJLE3, b=ng, out=JLE);
+    // JMP: j1 and j2 and j3
+       And(a=instruction[15], b=instruction[2], out=tempJMP1);
+       And(a=tempJMP1, b=instruction[1], out=tempJMP2);
+       And(a=tempJMP2, b=instruction[0], out=JMP);
+    // OR all of them together
+       Or8Way(in[0]=JGT, in[1]=JEQ, in[2]=JGE, in[3]=JTL, in[4]=JNE, in[5]=JLE, in[6]=JMP, in[7]=false, out=loadPC);
+
+    // writeM is true when instruction=C and d3
+       And(a=instruction[15], b=instruction[3], out=writeM);
+}
