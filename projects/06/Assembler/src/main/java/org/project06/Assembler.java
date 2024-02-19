@@ -51,10 +51,10 @@ public class Assembler {
                 String command = parser.advance();
 
                 String commandType = parser.identifyCommandType(command);
+
                 switch (commandType) {
                     case "A_COMMAND":
                         String symbol = parser.retrieveSymbolOfCommand(commandType, command);
-
                         if (isNumeric(symbol)) {
                             result = convertTo16Bit('0', parser.convertToBinary(symbol));
                             break;
@@ -67,12 +67,14 @@ public class Assembler {
                         break;
                     case "L_COMMAND":
                         continue;
-                        // C COMMAND
-                    default:
+                    case "C_COMMAND":
                         String binDest = code.convertDestToBinary(parser.retrieveDestFromCommand(command));
                         String binComp = code.convertCompToBinary(parser.retrieveCompFromCommand(command));
                         String binJump = code.convertJumpToBinary(parser.retrieveJumpFromCommand(command));
                         result = convertTo16Bit('1', binComp + binDest + binJump);
+                        break;
+                    default:
+                        continue;
                 }
                 bufferedWriter.write(result);
                 bufferedWriter.newLine();

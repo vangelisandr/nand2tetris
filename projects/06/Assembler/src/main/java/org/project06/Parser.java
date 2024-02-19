@@ -22,6 +22,10 @@ public class Parser {
         while (command.isEmpty() || command.startsWith("//")) {
             command = sc.nextLine().trim();
         }
+        // Check for in-line comments
+        if (command.contains("/")) {
+            command = command.substring(0, command.indexOf('/')).trim();
+        }
         return command;
     }
 
