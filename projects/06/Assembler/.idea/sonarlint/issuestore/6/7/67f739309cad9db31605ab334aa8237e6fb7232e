@@ -1,11 +1,10 @@
 
-g	java:S112&"FDefine and throw a dedicated exception instead of using a generic one.(Ò‚Òéüÿÿÿÿ8Ó£¶‘Ü1
+g	java:S112&"FDefine and throw a dedicated exception instead of using a generic one.(Ò‚Òéüÿÿÿÿ8‚İÚòÛ1
 l
-java:S1192"JDefine a constant instead of duplicating this literal "L_COMMAND" 3 times.(ùš® ÿÿÿÿÿ8Õ£¶‘Ü1
-u	java:S1351"YReduce the total number of break and continue statements in this loop to use at most one.(øÚÔÿ8İ¼·‘Ü1
+java:S1192"JDefine a constant instead of duplicating this literal "L_COMMAND" 3 times.(ùš® ÿÿÿÿÿ8ƒİÚòÛ1
 >
-java:S1643c"Use a StringBuilder instead.(îİµ³ùÿÿÿÿ8ÆäÖ‘Ü1
+java:S1643a"Use a StringBuilder instead.(îİµ³ùÿÿÿÿ8ƒİÚòÛ1
 o
-java:S3776"RRefactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.(Çµí‘8ù¥¶‘Ü1
-L	java:S106"+Replace this use of System.out by a logger.(Ä»òŸüÿÿÿÿ8ú¥¶‘Ü1
-G	java:S106T"+Replace this use of System.out by a logger.(ÂîÜş8™Ê‰’Ü1
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.(Çµí‘8ƒ›ôòÛ1
+L	java:S106"+Replace this use of System.out by a logger.(Ä»òŸüÿÿÿÿ8ŞÚòÛ1
+G	java:S106R"+Replace this use of System.out by a logger.(ÂîÜş8‹²áòÛ1
