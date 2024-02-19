@@ -61,16 +61,16 @@ public class Code {
 
     }
 
-    public String convertDestToBinary(String currentDest) {
-        return destMap.get(currentDest);
+    public String convertDestToBinary(String dest) {
+        return destMap.get(dest);
     }
 
-    public String convertCompToBinary(String currentComp) {
-        return compMap.get(currentComp);
+    public String convertCompToBinary(String comp) {
+        return compMap.get(comp);
     }
 
-    public String convertJumpToBinary(String currentJump) {
-        return jumpMap.get(currentJump);
+    public String convertJumpToBinary(String jump) {
+        return jumpMap.get(jump);
     }
 
 }
