@@ -70,7 +70,7 @@ public class Parser {
     }
 
     public String convertToBinary(int input) {
-       return Integer.toBinaryString(input);
+        return Integer.toBinaryString(input);
     }
 
     public void close() {
